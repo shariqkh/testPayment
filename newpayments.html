@@ -1,0 +1,317 @@
+
+<!-- saved from url=(0191)https://socionity.com/payments.html?pluginId=1602682927935.087&paymentId=1b9e79e340f741713756875eebb50220&method=wallet&state=Google_109081605263199217364/1602682927935.087/1605087704140.3196 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style type="text/css">.mui-textfield.mui-textfield--float-label > label {-webkit-transition:all .15s ease-out;-moz-transition:all .15s ease-out;-o-transition:all .15s ease-out;transition:all .15s ease-out;}</style><style type="text/css">@keyframes mui-btn-inserted{from{transform:none;}to{transform:none;}}.mui-btn{animation-duration:0.0001s;animation-name:mui-btn-inserted;}@keyframes mui-dropdown-inserted{from{transform:none;}to{transform:none;}}[data-mui-toggle="dropdown"]{animation-duration:0.0001s;animation-name:mui-dropdown-inserted;}@keyframes mui-btn-inserted,mui-dropdown-inserted{from{transform:none;}to{transform:none;}}.mui-btn[data-mui-toggle="dropdown"]{animation-duration:0.0001s;animation-name:mui-btn-inserted,mui-dropdown-inserted;}@keyframes mui-tab-inserted{from{transform:none;}to{transform:none;}}[data-mui-toggle="tab"]{animation-duration:0.0001s;animation-name:mui-tab-inserted;}@keyframes mui-textfield-inserted{from{transform:none;}to{transform:none;}}.mui-textfield > input{animation-duration:0.0001s;animation-name:mui-textfield-inserted;}@keyframes mui-textfield-inserted{from{transform:none;}to{transform:none;}}.mui-textfield > textarea{animation-duration:0.0001s;animation-name:mui-textfield-inserted;}@keyframes mui-select-inserted{from{transform:none;}to{transform:none;}}.mui-select > select{animation-duration:0.0001s;animation-name:mui-select-inserted;}@keyframes mui-node-inserted{from{transform:none;}to{transform:none;}}.mui-select > select ~ .mui-event-trigger{animation-duration:0.0001s;animation-name:mui-node-inserted;}@keyframes mui-node-disabled{from{transform:none;}to{transform:none;}}.mui-select > select:disabled ~ .mui-event-trigger{animation-duration:0.0001s;animation-name:mui-node-disabled;}</style>
+        
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        
+
+        <script type="text/javascript" integrity="sha384-JuTNYkgKcv1YWHTHxD083VG16UGvE0QIORVstsbIKtGUBrB1ldQRU9eyEZEreszu" crossorigin="anonymous" async="" src="./newpayments_files/amplitude-6.0.0-min.gz.js"></script><script async="" src="./newpayments_files/fbevents.js"></script><script src="./newpayments_files/jquery.min.js"></script>
+        <script src="./newpayments_files/axios.min.js"></script>
+        <script src="./newpayments_files/checkout.js"></script>
+        <link rel="stylesheet" href="./newpayments_files/icon">
+        <link href="./newpayments_files/mui.min.css" rel="stylesheet" type="text/css">
+        <script src="./newpayments_files/mui.min.js"></script>
+<!-- Facebook Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=2108565599460395&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Facebook Pixel Code -->
+
+
+        <script>
+            /*
+            //test
+            const RAZORPAYID = "rzp_test_uz9cnhBRAi5TZE";
+            const APIURL = "http://localhost:3000";
+            */
+            /*
+            //prod
+            */
+            const RAZORPAYID = "rzp_live_QjsJpPMCUoOM7l";
+            const APIURL = "https://api-v1.socionity.com";
+
+            var getUrlParameter = function getUrlParameter(sParam) {
+                var sPageURL = window.location.search.substring(1),
+                    sURLVariables = sPageURL.split('&'),
+                    sParameterName,
+                    i;
+
+                for (i = 0; i < sURLVariables.length; i++) {
+                    sParameterName = sURLVariables[i].split('=');
+
+                    if (sParameterName[0] === sParam) {
+                        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                    }
+                }
+            };
+            var getColor = function(rgb) {
+
+                    rgb = rgb.css('background-color');
+                    // Strip everything except the integers eg. "rgb(" and ")" and " "
+                    rgb = rgb.split(/\(([^)]+)\)/)[1].replace(/ /g, '');
+
+                    // map RGB values to variables
+                    var r = parseInt(rgb.split(',')[0], 10),
+                        g = parseInt(rgb.split(',')[1], 10),
+                        b = parseInt(rgb.split(',')[2], 10),
+                        a;
+
+                    // if RGBA, map alpha to variable (not currently in use)
+                    if (rgb.split(',')[3] !== null) {
+                        a = parseInt(rgb.split(',')[3], 10);
+                    }
+
+                    // calculate contrast of color (standard grayscale algorithmic formula)
+                    var contrast = (Math.round(r * 299) + Math.round(g * 587) + Math.round(b * 114)) / 1000;
+
+                    return (contrast >= 128) ? 'black' : 'white';
+            }
+
+
+            var showStatus = function(s){
+                $("#payment").hide();
+                $("#processing").hide();
+                $("#failed").hide();
+                $("#success").hide();
+                $("#"+s).show();
+            }
+
+            var showModal = function() {
+                $('#myModal').modal('show');
+            }
+
+            var hideModal = function() {
+                $('#myModal').modal('hide');
+            }
+
+            var pay = function() {
+                const { app, payment, user } = window.response;
+                
+                showStatus("processing");
+
+
+                showModal();
+                const prefill = {
+                    method: getUrlParameter('method'),
+                    contact: user.phone,
+                    email: user.email
+                }
+                var options = {
+                    "key": RAZORPAYID,
+                    "amount": Math.ceil(payment.price * 100),
+                    "currency": payment.currency,
+                    "name": payment.title || "Payment for "+app.name,
+                    prefill,
+                    "description": "Powered by Socionity.com",
+                    "order_id": null,
+                    "handler": async function (response){
+                        if(response.razorpay_payment_id){
+                            showStatus("success");
+                            try{
+                              if(app.marketing && app.marketing.fbPixel){
+                                fbq('track', 'Purchase', { currency : payment.currency, value: payment.price });
+                                console.log("Purchase Successful", { currency : payment.currency, value: Math.floor(payment.price) });
+                              }
+                            }
+                            catch(e){
+                              console.log(e);
+                            }                            
+                            amplitude.getInstance().logEvent('payment-success', { currency: payment.currency, price: Math.floor(payment.price)});
+                            setTimeout( () => {
+                                amplitude.getInstance().setUserId(null);
+                                window.location.href = 'https://'+app.domain+"?state="+getUrlParameter('state');
+                            },3000)
+                        }
+                        else{
+                            showStatus("failed");
+                            setTimeout( () => {
+                                showStatus('payment');
+                            }, 3000)
+                        }
+
+                    },
+                    "modal": {
+                        "ondismiss": function(){
+                            showStatus("payment");
+                        }
+                    },
+                    "theme": {
+                        "color": app.theme.primary
+                    },
+                    "notes" : {
+                        "userId": user.userId,
+                        "pluginId": payment.pluginId,
+                        "paymentFor": payment.paymentFor,
+                        "location": window.location.href,
+                        "paymentId": payment.paymentId,
+                        "appId": app.appId,
+                    }
+                };
+                var rzp1 = new window.Razorpay(options);
+                rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+                });
+                rzp1.open();
+
+            }
+
+            $(document).ready(function() {
+              const pluginId = getUrlParameter("pluginId");
+              const paymentId = getUrlParameter("paymentId");
+              axios.get(APIURL+"/payments/plugins/"+pluginId+"/payments/"+paymentId).then(response => {
+                window.response = response.data;
+                try{
+                    amplitude.getInstance().setUserId(app.owner);
+                    amplitude.getInstance().logEvent('payment-open');
+                }
+                catch(e) {
+                    console.log("logging failed");
+                }
+                const { app, payment, user } = response.data;
+                //payment.price = Math.ceil(payment.price);
+                payment.price = payment.price.toFixed(2);
+                window.response.payment = payment;
+                try{
+                  if(app.marketing && app.marketing.fbPixel){
+                      let matching = {};
+                      if(user.info.email)
+                        matching.em = user.info.email;
+                      if(user.info.phone)
+                        matching.ph = user.info.phone.replace(/\D/g,"");
+                      fbq('init', app.marketing.fbPixel);
+
+                      fbq('track', 'CompleteRegistration', { currency: payment.currency, value: Math.floor(payment.price) });
+                      console.log("Purchase Initiated", { currency : payment.currency, value: payment.price });
+                  }
+                }
+                catch(e){
+                  console.log(e);
+                }
+                $("body").css("background-color", app.theme.bg);
+                $("#container").css("background-color", app.theme.fg);
+                $("#container").css("color", app.theme.accent);
+                $("#loading").hide();
+                $("#payment").show();
+                $("#logo").attr("src", app.logo);
+                $("#name").html(app.name);
+                $("#name").css("color", getColor($("#container")));
+                $("#price").html(payment.currency + " " +payment.price);
+
+                $("#paybutton").css("background-color", app.theme.primary);
+                $("#paybutton").css("color",getColor($("#paybutton")));
+                $("#tnc").css("color",getColor($("#container")));
+              })
+            });
+        </script>
+<script type="text/javascript">
+(function(e,t){var n=e.amplitude||{_q:[],_iq:{}};var r=t.createElement("script")
+;r.type="text/javascript"
+;r.integrity="sha384-JuTNYkgKcv1YWHTHxD083VG16UGvE0QIORVstsbIKtGUBrB1ldQRU9eyEZEreszu"
+;r.crossOrigin="anonymous";r.async=true
+;r.src="https://cdn.amplitude.com/libs/amplitude-6.0.0-min.gz.js"
+;r.onload=function(){if(!e.amplitude.runQueuedFunctions){
+console.log("[Amplitude] Error: could not load SDK")}}
+;var i=t.getElementsByTagName("script")[0];i.parentNode.insertBefore(r,i)
+;function s(e,t){e.prototype[t]=function(){
+this._q.push([t].concat(Array.prototype.slice.call(arguments,0)));return this}}
+var o=function(){this._q=[];return this}
+;var a=["add","append","clearAll","prepend","set","setOnce","unset"]
+;for(var u=0;u<a.length;u++){s(o,a[u])}n.Identify=o;var c=function(){this._q=[]
+;return this}
+;var l=["setProductId","setQuantity","setPrice","setRevenueType","setEventProperties"]
+;for(var p=0;p<l.length;p++){s(c,l[p])}n.Revenue=c
+;var d=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","enableTracking","setGlobalUserProperties","identify","clearUserProperties","setGroup","logRevenueV2","regenerateDeviceId","groupIdentify","onInit","logEventWithTimestamp","logEventWithGroups","setSessionId","resetSessionId"]
+;function v(e){function t(t){e[t]=function(){
+e._q.push([t].concat(Array.prototype.slice.call(arguments,0)))}}
+for(var n=0;n<d.length;n++){t(d[n])}}v(n);n.getInstance=function(e){
+e=(!e||e.length===0?"$default_instance":e).toLowerCase()
+;if(!n._iq.hasOwnProperty(e)){n._iq[e]={_q:[]};v(n._iq[e])}return n._iq[e]}
+;e.amplitude=n})(window,document);
+
+amplitude.getInstance().init("cd3f015c686b510030ac331dbc80c87d");
+</script>
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+
+    <body style="background-color: rgb(251, 251, 251);">
+        <div class="mui-panel" id="container" style="width: calc(100% - 48px); max-width: 800px; margin-top: 5%; margin-left: auto; margin-right: auto; border-radius: 4px; text-align: center; padding: 24px; background-color: rgb(243, 243, 243); color: rgb(56, 128, 0);">
+            <div id="loading" style="display: none;">
+                Loading payment information <br> Please wait....
+            </div>
+            <div id="payment" style="">
+                <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+
+                <!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog" >
+    <div class="modal-dialog">
+  
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Modal Header</h4>
+        </div>
+        <div class="modal-body">
+          <p>Some text in the modal.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+                <img src="./newpayments_files/1605010426601.1294-68e8d658d510ea6a1ef42a439af49098.jpg" style="height: 200px; width: 200px; border-radius: 100px" id="logo">
+                <br><br>
+                <h1 id="name" style="color: black;">TestApple</h1>
+
+                <h2 id="price">INR 2.00</h2>
+                <br><br>
+                <div class="mui-btn--raised" onclick="pay()" id="paybutton" style="padding: 8px 24px; border-radius: 4px; cursor: pointer; background-color: rgb(73, 166, 0); color: white;">
+                    Proceed to Pay
+                </div>
+                <br><br>
+                <small id="tnc" style="color: black;">By clicking on Proceed to Pay, you agree to the <a href="https://socionity.com/tnc.html">terms and conditions</a> for using this website</small>
+                <br><br>
+                <img src="./newpayments_files/paymentpoweredby.png" style="width:100%">
+
+
+
+            <div id="processing" style="display: none;">
+                Processing payment, please wait ...
+            </div>
+            <div id="failed" style="display:none">
+                <h2>Payment Failed</h2>
+                <i class="material-icons" style="font-size: 150px">cross</i>
+                <br><br>
+                <p> Please wait while we safely redirect you... </p>
+
+            </div>
+            <div id="success" style="display:none">
+                <h1>Payment Successful!</h1>
+                <br><br>
+                <i class="material-icons" style="font-size: 150px">check</i>
+                <br><br>
+                <p> Please wait while we safely redirect you... </p>
+            </div>
+        </div>
+        
+    
+
+<div class="razorpay-container" style="z-index: 1000000000; position: fixed; top: 0px; display: none; left: 0px; height: 100%; width: 100%; backface-visibility: hidden; overflow-y: visible;"><style>@keyframes rzp-rot{to{transform: rotate(360deg);}}@-webkit-keyframes rzp-rot{to{-webkit-transform: rotate(360deg);}}</style><div class="razorpay-backdrop" style="min-height: 100%; transition: all 0.3s ease-out 0s; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%;"><span style="text-decoration: none; background: rgb(214, 68, 68); border: 1px dashed white; padding: 3px; opacity: 0; transform: rotate(45deg); transition: opacity 0.3s ease-in 0s; font-family: lato, ubuntu, helvetica, sans-serif; color: white; position: absolute; width: 200px; text-align: center; right: -50px; top: 50px;">Test Mode</span></div><iframe style="opacity: 1; height: 100%; position: relative; background: none; display: block; border: 0px none transparent; margin: 0px; padding: 0px; z-index: 2; width: 100%;" allowtransparency="true" frameborder="0" width="100%" height="100%" allowpaymentrequest="true" src="./newpayments_files/public.html" class="razorpay-checkout-frame"></iframe></div></body></html>
